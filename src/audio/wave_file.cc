@@ -33,11 +33,14 @@ WaveFile::~WaveFile() {
 bool WaveFile::read(const char *name) {
   FILE *f = fopen(name, "rb");
 
-  if (!f)
+  if (!f) {
+    Log::printf(Log::LERROR, "Failed to open %s\n", name);
     return false;
+  }
 
   if (fseek(f, 0, SEEK_END)) {
     fclose(f);
+    Log::printf(Log::LERROR, "Failed to seek %s\n", name);
     return false;
   }
 
@@ -45,6 +48,7 @@ bool WaveFile::read(const char *name) {
 
   if (sz <= 0) {
     fclose(f);
+    Log::printf(Log::LERROR, "Failed to get size %s\n", name);
     return false;
   }
 
@@ -61,6 +65,7 @@ bool WaveFile::read(const char *name) {
 
   if (sz < 40) {
     cleanup();
+    Log::printf(Log::LERROR, "File %s too small\n", name);
     return false;
   }
 
