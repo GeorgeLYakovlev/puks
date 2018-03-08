@@ -6,6 +6,7 @@
 #include <gtk/gtk.h>
 #include <vector>
 
+#include "ui/main_window.h"
 #include "utils/log.h"
 
 const int kProviderPriority = 800;  // STYLE_PROVIDER_PRIORITY_USER
@@ -34,13 +35,6 @@ void SvoyakWindow::redo_layout() {
   int width = clip.get_width();
   char buff[128];
 
-  /*for (int i = 1; i <= 8; ++i) {
-    snprintf(buff, sizeof(buff), "entry_name%d", i);
-    Gtk::Entry *name_entry = nullptr;
-    ref_glade_->get_widget(buff, name_entry);
-    name_entry->set_size_request(100, name_entry->get_height());
-  }*/
-
   update_fonts();
 
   // Modify label header
@@ -68,13 +62,15 @@ void SvoyakWindow::redo_layout() {
       (button->get_allocation().get_x() + button->get_width()) -
       kRightMargin;
   printf("Desired delta %i\n", desired_delta);
-  /*for (int i = 1; i <= 8; ++i) {
+  for (int i = 1; i <= 8; ++i) {
     snprintf(buff, sizeof(buff), "entry_name%d", i);
     Gtk::Entry *name_entry = nullptr;
     ref_glade_->get_widget(buff, name_entry);
+    printf("Width 2 %d\n", name_entry->get_width());
     name_entry->set_size_request(name_entry->get_width() + desired_delta,
                                  name_entry->get_height());
-  }*/
+    printf("Width 3 %d\n", name_entry->get_width());
+  }
 }
 
 void SvoyakWindow::update_fonts() {
@@ -253,6 +249,19 @@ void SvoyakWindow::align_player_controls() {
                           "GtkEntry")
         .set_background_color(0x408040)
         .provider();
+
+
+  for (int i = 1; i <= 8; ++i) {
+    snprintf(buff, sizeof(buff), "entry_name%d", i);
+    Gtk::Entry *name_entry = nullptr;
+    ref_glade_->get_widget(buff, name_entry);
+    printf("Width 0 %d\n", name_entry->get_width());
+    name_entry->set_size_request(-1, -1);
+    // name_entry->set_size_request(100, name_entry->get_height());
+    process_ui_events();
+    printf("Width 1 %d\n", name_entry->get_width());
+  }
+
   // Align top headers:
   Gtk::Label *players = nullptr;
   Gtk::Label *total_score = nullptr;
@@ -291,8 +300,8 @@ void SvoyakWindow::align_player_controls() {
     Gtk::Label *label_name_select = nullptr;
     snprintf(buff, sizeof(buff), "label_name_select%d", i);
     ref_glade_->get_widget(buff, label_name_select);
-    name_entry->set_size_request(name_entry->get_width() / 2,
-                                 desired_size / 4);
+    // name_entry->set_size_request(name_entry->get_width() / 2,
+    //                             desired_size / 4);
     if (i > players_) {
       name_entry->hide();
       label_total->hide();

@@ -23,6 +23,11 @@ std::string get_resource_path(const char *subpath) {
   return full;
 }
 
+void process_ui_events() {
+  while (gtk_events_pending())
+    gtk_main_iteration();
+}
+
 int run_main_window(
   std::map<std::string, std::string>* settings,
   int argc, char *argv[]) {
