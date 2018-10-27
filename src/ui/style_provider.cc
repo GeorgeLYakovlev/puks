@@ -41,9 +41,9 @@ CustomStyleProvider::CustomStyleProvider(const char *name, int size_points,
     : name_(name), size_points_(size_points), bold_(bold), color_(color),
       widget_(widget), background_color_(-1) {
   init_styles_if_necessary();
-  auto it = s_widget_names.find(name_);
+  auto it = s_widget_names.find(widget_);
   if (it != s_widget_names.end())
-    name_ = it->second;
+    widget_ = it->second;
 }
 
 CustomStyleProvider::~CustomStyleProvider() {

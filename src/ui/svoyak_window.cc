@@ -142,7 +142,6 @@ void SvoyakWindow::update_children(
   }
 }
 
-
 void SvoyakWindow::on_button_clicked(std::string name) {
   printf("Button %s is clicked\n", name.c_str());
 }
