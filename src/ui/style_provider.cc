@@ -71,7 +71,7 @@ Glib::RefPtr<Gtk::StyleProvider> CustomStyleProvider::provider() {
                bold_ ? "font-weight: bold; " : "",
                name_.c_str(), size_points_);
     }
-    Log::printf(Log::LDEBUG, "Widget:%s\nData:%s\n", widget_.c_str(), data);
+    // Log::printf(Log::LDEBUG, "Widget:%s\nData:%s\n", widget_.c_str(), data);
     auto css = Gtk::CssProvider::create();
     if (css->load_from_data(data)) {
       provider_ = css;

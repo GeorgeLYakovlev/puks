@@ -12,6 +12,8 @@
 const int kProviderPriority = 800;  // STYLE_PROVIDER_PRIORITY_USER
 const char *kScoreButtonBeginning = "button_";
 
+int tmp_add_font = 0;
+
 SvoyakWindow::SvoyakWindow(BaseObjectType* cobject,
                            const Glib::RefPtr<Gtk::Builder>& ref_glade)
     : Gtk::Window(cobject),
@@ -66,10 +68,10 @@ void SvoyakWindow::redo_layout() {
     snprintf(buff, sizeof(buff), "entry_name%d", i);
     Gtk::Entry *name_entry = nullptr;
     ref_glade_->get_widget(buff, name_entry);
-    printf("Width 2 %d\n", name_entry->get_width());
+    // printf("Width 2 %d\n", name_entry->get_width());
     name_entry->set_size_request(name_entry->get_width() + desired_delta,
                                  name_entry->get_height());
-    printf("Width 3 %d\n", name_entry->get_width());
+    // printf("Width 3 %d\n", name_entry->get_width());
   }
 }
 
@@ -78,15 +80,25 @@ void SvoyakWindow::update_fonts() {
   const int kTopLineSize = 32;
   const int kSecondSize = 20;
   const int kTimerSize = 86;
-  const int kDefaultSize = 8;
+  const int kDefaultSize = 12;
 
   auto clip = get_clip();
 
   int height = clip.get_height();
   scale_ = static_cast<float>(height) / 600.0;
   auto scale_func = [=](int sz) -> int {
-    return static_cast<int>(scale_ * sz + 0.5);
+    // return static_cast<int>(scale_ * sz);
+    return sz + tmp_add_font;
   };
+  Log::printf(Log::LDEBUG, "Font: %d ->%d\n",
+              kDefaultSize, scale_func(kDefaultSize));
+  Log::printf(Log::LDEBUG, "Font: %d ->%d\n",
+              kSecondSize, scale_func(kSecondSize));
+  Log::printf(Log::LDEBUG, "Font: %d ->%d\n",
+              kTopLineSize, scale_func(kTopLineSize));
+  Log::printf(Log::LDEBUG, "Font: %d ->%d\n",
+              kTimerSize, scale_func(kTimerSize));
+
   CustomStyleProvider all_controls(kFont, scale_func(kDefaultSize), true);
   update_children(this, all_controls.provider());
   Gtk::Label *label_header = nullptr;
@@ -144,6 +156,12 @@ void SvoyakWindow::update_children(
 
 void SvoyakWindow::on_button_clicked(std::string name) {
   printf("Button %s is clicked\n", name.c_str());
+  if (!name.compare("button_10_1")) {
+    tmp_add_font++;
+  } else if (!name.compare("button_20_1")) {
+    tmp_add_font--;
+  }
+  update_fonts();
 }
 
 
@@ -214,9 +232,15 @@ void SvoyakWindow::align_player_controls() {
   Gtk::Button *button = nullptr;
   char buff[128];
 
+  // Limit font increase.
+  int font_scale = players_ > 4 ? players_ : 5;
+
   int font_size = static_cast<int>(scale_ * kBaseFontSize *
-                                 (9.0 / (players_ + 1.0)) +
+                                 (8.0 / 5.0) +
                                    0.5);
+
+  Log::printf(Log::LDEBUG, "Font 2: %d ->%d\n",
+              kBaseFontSize, font_size);
 
   score_black_ = CustomStyleProvider(kButtonFont, font_size).provider();
   score_blue_ =
@@ -254,11 +278,11 @@ void SvoyakWindow::align_player_controls() {
     snprintf(buff, sizeof(buff), "entry_name%d", i);
     Gtk::Entry *name_entry = nullptr;
     ref_glade_->get_widget(buff, name_entry);
-    printf("Width 0 %d\n", name_entry->get_width());
+    // printf("Width 0 %d\n", name_entry->get_width());
     name_entry->set_size_request(-1, -1);
     // name_entry->set_size_request(100, name_entry->get_height());
     process_ui_events();
-    printf("Width 1 %d\n", name_entry->get_width());
+    // printf("Width 1 %d\n", name_entry->get_width());
   }
 
   // Align top headers:
@@ -269,7 +293,7 @@ void SvoyakWindow::align_player_controls() {
   ref_glade_->get_widget("button_time", button);
   int desired_size = (button->get_allocation().get_y() -
                       players->get_allocation().get_y()) /
-                     (players_ + 1);
+                     players_;
   players->set_size_request(players->get_width(), desired_size);
   total_score->set_size_request(total_score->get_width(), desired_size);
   players
