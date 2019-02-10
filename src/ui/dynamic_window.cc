@@ -73,12 +73,12 @@ void DynamicWindow::redo_layout() {
       style_top_label_, kProviderPriority);
   TextMetics tm(this);
   tm.set_font(tourney->get_style_context()->get_font());
-  tourney->set_size_request(w - kBorder * 2, 30 * 5);
+  tourney->set_size_request(w - kBorder * 2, 30);
   Log::printf(Log::LDEBUG, "WH:{%d,%d}\n",
               tourney->get_allocated_width(), tourney->get_allocated_height());
   int updated =
       tm.find_max_that_fit((*settings_)[TOURNEY].c_str(),
-                           w - kBorder * 2, 30 * 5);
+                           w - kBorder * 2, 30, true);
   CustomStyleProvider sp1;
 
   sp1.set_bold(true);
@@ -86,7 +86,7 @@ void DynamicWindow::redo_layout() {
   sp1.set_background_color(0xFF0000);
   sp1.set_size(updated + 25);
   tm.does_fit((*settings_)[TOURNEY].c_str(),
-              w - kBorder * 2, 30 * 5, updated + 25);
+              w - kBorder * 2, 30 * 5, updated);
   style_top_label_ = sp1.provider();
   tourney->get_style_context()->add_provider(
       style_top_label_, kProviderPriority);

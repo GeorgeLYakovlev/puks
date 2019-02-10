@@ -24,9 +24,11 @@ void TextMetics::set_font(const Pango::FontDescription& fd) {
 void TextMetics::get_text_metrics(const char *text, int *w, int *h) {
   pango_layout_->set_text(text);
   pango_layout_->set_font_description(pango_font_);
-  pango_layout_->get_pixel_size(*w, *h);
+  // pango_layout_->get_pixel_size(*w, *h);
   Pango::Rectangle ink_rect, logical_rect;
   pango_layout_->get_extents(ink_rect, logical_rect);
+  *w = ink_rect.get_width() / kPangoScale;
+  *h = ink_rect.get_height() / kPangoScale;
   Log::printf(Log::LDEBUG,
               "Ink:{%d,%d - %d,%d} Logical:{%d,%d - %d,%d} F(%s)\n",
               ink_rect.get_x() / kPangoScale,
@@ -40,20 +42,22 @@ void TextMetics::get_text_metrics(const char *text, int *w, int *h) {
               pango_font_.to_string().c_str());
 }
 
-int TextMetics::find_max_that_fit(const char *text, int w, int h) {
+int TextMetics::find_max_that_fit(const char *text, int w, int h,
+                                  bool vertically_only) {
   std::vector<std::string> texts;
   texts.push_back(text);
-  return find_max_that_fit(texts, w, h);
+  return find_max_that_fit(texts, w, h, vertically_only);
 }
 
 int TextMetics::find_max_that_fit(const std::vector<std::string>& texts,
-                                  int w, int h) {
+                                  int w, int h, bool vertically_only) {
   int sz = pango_font_.get_size() / kPangoScale;
   int grow = does_fit(texts, w, h, sz);
   int sz_new = grow ? (sz << 1) : (sz >> 1);
   for (sz_new = grow ? (sz << 1) : (sz >> 1);;
        sz_new = grow ? (sz_new << 1) : (sz_new >> 1)) {
-    bool fits = does_fit(texts, w, h, sz_new);
+    bool fits = vertically_only ?
+        does_fit_vertically(texts, h, sz_new) : does_fit(texts, w, h, sz_new);
     if (grow) {
       if (fits)
         sz = sz_new;
@@ -67,7 +71,8 @@ int TextMetics::find_max_that_fit(const std::vector<std::string>& texts,
     }
   }
   for (int sz_mid = (sz + sz_new) / 2; ; sz_mid = (sz + sz_new) / 2) {
-    bool fits = does_fit(texts, w, h, sz_mid);
+    bool fits = vertically_only ?
+        does_fit_vertically(texts, h, sz_new) : does_fit(texts, w, h, sz_mid);
     if (grow) {
       if (sz == sz_mid)
         break;
@@ -116,5 +121,23 @@ bool TextMetics::does_fit(const std::vector<std::string>& texts,
   pango_font_.set_size(fs);
   Log::printf(Log::LDEBUG, "->%s\n",
               res ? "t" : "f");
+  return res;
+}
+
+bool TextMetics::does_fit_vertically(
+    const std::vector<std::string>& texts,
+    int h, int font_size) {
+  int wt, ht;
+  int fs = pango_font_.get_size();
+  pango_font_.set_size(font_size * kPangoScale);
+  bool res = true;
+  for (auto it = texts.cbegin(); it != texts.cend(); ++it) {
+    get_text_metrics(it->c_str(), &wt, &ht);
+    if (ht > h) {
+      res = false;
+      break;
+    }
+  }
+  pango_font_.set_size(fs);
   return res;
 }
