@@ -8,6 +8,7 @@
 
 #include "./version.h"
 #include "ui/svoyak_window.h"
+#include "ui/dynamic_window.h"
 
 const int kOffsetWidth = 100;
 const int kOffsetHeight = 100;
@@ -33,19 +34,21 @@ int run_main_window(
   int argc, char *argv[]) {
   auto app = Gtk::Application::create(argc, argv, "com.pacwww.puks");
 
-  Glib::RefPtr<Gtk::Builder> builder =
+  /*  Glib::RefPtr<Gtk::Builder> builder =
       Gtk::Builder::create_from_file(get_resource_path(kSvoyakGlade).c_str());
 
   SvoyakWindow *window = nullptr;
-
+  */
   GdkScreen *screen = gdk_screen_get_default();
   int width = gdk_screen_get_width(screen);
   int height = gdk_screen_get_height(screen);
   printf("Screen w:%d h:%d\n", width, height);
+  DynamicWindow *window =
+      DynamicWindow::CreateWindow(width - 200, height - 200, settings);
 
-  builder->get_widget_derived("window_svoyak", window);
+  // builder->get_widget_derived("window_svoyak", window);
 
-  window->set_default_size(800, 600);
+  // window->set_default_size(800, 600);
 
   return app->run(*window);
 }

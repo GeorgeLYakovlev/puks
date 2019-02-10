@@ -12,3 +12,4 @@ std::map<std::string, std::string> read_config_file(const char *name);
 void write_config_file(
     const char *name, const std::map<std::string, std::string>& config);
 
+std::string indexed_id(const char *id_format, int index);

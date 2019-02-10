@@ -42,3 +42,9 @@ void write_config_file(
 
   fclose(f);
 }
+
+std::string indexed_id(const char *id_format, int index) {
+  char buff[256];
+  snprintf(buff, sizeof(buff), id_format, index);
+  return std::string(buff);
+}
