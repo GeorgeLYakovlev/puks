@@ -29,17 +29,6 @@ void TextMetics::get_text_metrics(const char *text, int *w, int *h) {
   pango_layout_->get_extents(ink_rect, logical_rect);
   *w = ink_rect.get_width() / kPangoScale;
   *h = ink_rect.get_height() / kPangoScale;
-  Log::printf(Log::LDEBUG,
-              "Ink:{%d,%d - %d,%d} Logical:{%d,%d - %d,%d} F(%s)\n",
-              ink_rect.get_x() / kPangoScale,
-              ink_rect.get_y() / kPangoScale,
-              ink_rect.get_width() / kPangoScale,
-              ink_rect.get_height() / kPangoScale,
-              logical_rect.get_x() / kPangoScale,
-              logical_rect.get_y() / kPangoScale,
-              logical_rect.get_width() / kPangoScale,
-              logical_rect.get_height() / kPangoScale,
-              pango_font_.to_string().c_str());
 }
 
 int TextMetics::find_max_that_fit(const char *text, int w, int h,
@@ -72,7 +61,7 @@ int TextMetics::find_max_that_fit(const std::vector<std::string>& texts,
   }
   for (int sz_mid = (sz + sz_new) / 2; ; sz_mid = (sz + sz_new) / 2) {
     bool fits = vertically_only ?
-        does_fit_vertically(texts, h, sz_new) : does_fit(texts, w, h, sz_mid);
+        does_fit_vertically(texts, h, sz_mid) : does_fit(texts, w, h, sz_mid);
     if (grow) {
       if (sz == sz_mid)
         break;
@@ -105,22 +94,16 @@ bool TextMetics::does_fit(const std::vector<std::string>& texts,
   int wt, ht;
   int fs = pango_font_.get_size();
   pango_font_.set_size(font_size * kPangoScale);
-  Log::printf(Log::LDEBUG, "W:%d h:%d (%d=>%d)\n",
-              w, h, fs / kPangoScale, font_size);
 
   bool res = true;
   for (auto it = texts.cbegin(); it != texts.cend(); ++it) {
     get_text_metrics(it->c_str(), &wt, &ht);
     if (wt > w || ht > h) {
-      Log::printf(Log::LDEBUG, "<%s>W:%d h:%d\n",
-                  it->c_str(), wt, ht);
       res = false;
       break;
     }
   }
   pango_font_.set_size(fs);
-  Log::printf(Log::LDEBUG, "->%s\n",
-              res ? "t" : "f");
   return res;
 }
 
@@ -133,6 +116,8 @@ bool TextMetics::does_fit_vertically(
   bool res = true;
   for (auto it = texts.cbegin(); it != texts.cend(); ++it) {
     get_text_metrics(it->c_str(), &wt, &ht);
+    // Log::printf(Log::LDEBUG, "%d TEXT=%s w:%d h:%d\n",
+    //            font_size, it->c_str(), wt, ht);
     if (ht > h) {
       res = false;
       break;

@@ -3,5 +3,8 @@
 
 #pragma once
 
-#define TOURNEY "TOURNEY"
+#define TOURNEY  "TOURNEY"
+#define ROOM     "ROOM"
+#define STAGE    "STAGE"
+#define ROUND    "ROUND"
 #define PLAYER_F "PLAYER%d"

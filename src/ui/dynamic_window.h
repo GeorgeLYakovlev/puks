@@ -23,6 +23,9 @@ class DynamicWindow : public Gtk::Window {
   void update_fonts();
   void on_button_clicked(std::string name);
 
+  void layout_score(Gtk::Grid *score, int w, int h,
+                    const Pango::FontDescription& fd);
+
   /*  void on_time_clicked();
   void on_cancel_clicked();
   void on_previous_clicked();
@@ -35,9 +38,10 @@ class DynamicWindow : public Gtk::Window {
  private:
   Gtk::Box *outer_box_;
   Glib::RefPtr<Gtk::StyleProvider> style_top_label_;
+  Glib::RefPtr<Gtk::StyleProvider> style_second_label_;
+  Gtk::Label *round_;
+  Gtk::Grid *score_;
   /*
-  Glib::RefPtr<Gtk::Builder> ref_glade_;
-
   // Timer
   Glib::RefPtr<Gtk::StyleProvider> style_counter_black_;
   Glib::RefPtr<Gtk::StyleProvider> style_counter_green_;
@@ -48,6 +52,7 @@ class DynamicWindow : public Gtk::Window {
   Glib::RefPtr<Gtk::StyleProvider> button_black_;
   Glib::RefPtr<Gtk::StyleProvider> button_green_;
   Glib::RefPtr<Gtk::StyleProvider> button_red_;
+  */
 
   // Score buttons
   Glib::RefPtr<Gtk::StyleProvider> score_black_;
@@ -59,6 +64,7 @@ class DynamicWindow : public Gtk::Window {
   Glib::RefPtr<Gtk::StyleProvider> edit_black_on_white_;
   Glib::RefPtr<Gtk::StyleProvider> edit_black_on_green_;
 
+  /*
   // All other controls
   Glib::RefPtr<Gtk::StyleProvider> control_black_;
   */

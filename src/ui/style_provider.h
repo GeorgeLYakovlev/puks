@@ -15,23 +15,28 @@ class CustomStyleProvider {
 
   CustomStyleProvider& set_name(const char* name) {
     name_ = name;
+    dirty_ = true;
     return *this;
   }
   CustomStyleProvider& set_size(int size_points) {
     size_points_ = size_points;
+    dirty_ = true;
     return *this;
   }
-  CustomStyleProvider& set_bold(bool bold) { bold_ = bold; return *this; }
+  CustomStyleProvider& set_bold(bool bold) {
+    bold_ = bold;
+    dirty_ = true;
+    return *this;
+  }
   CustomStyleProvider& set_color(unsigned color) {
     color_ = color;
+    dirty_ = true;
     return *this;
   }
-  CustomStyleProvider& set_widget(const char* widget) {
-    widget_ = widget;
-    return *this;
-  }
+  CustomStyleProvider& set_widget(const char* widget);
   CustomStyleProvider& set_background_color(int background_color) {
     background_color_ = background_color;
+    dirty_ = true;
     return *this;
   }
 
@@ -44,6 +49,7 @@ class CustomStyleProvider {
   unsigned color_;
   std::string widget_;
   int background_color_;
+  bool dirty_;
 
   Glib::RefPtr<Gtk::StyleProvider> provider_;
 };

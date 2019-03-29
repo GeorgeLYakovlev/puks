@@ -39,7 +39,7 @@ CustomStyleProvider::CustomStyleProvider(const char *name, int size_points,
                                          bool bold, unsigned color,
                                          const char *widget)
     : name_(name), size_points_(size_points), bold_(bold), color_(color),
-      widget_(widget), background_color_(-1) {
+      widget_(widget), background_color_(-1), dirty_(false) {
   init_styles_if_necessary();
   auto it = s_widget_names.find(widget_);
   if (it != s_widget_names.end())
@@ -49,8 +49,17 @@ CustomStyleProvider::CustomStyleProvider(const char *name, int size_points,
 CustomStyleProvider::~CustomStyleProvider() {
 }
 
+CustomStyleProvider& CustomStyleProvider::set_widget(const char* widget) {
+  auto it = s_widget_names.find(widget);
+  if (it != s_widget_names.end()) {
+    widget_ = it->second;
+    dirty_ = true;
+  }
+  return *this;
+}
+
 Glib::RefPtr<Gtk::StyleProvider> CustomStyleProvider::provider() {
-  if (!provider_) {
+  if (!provider_ || dirty_) {
     char data[256];
     char background_color[128];
     if (background_color_ >= 0) {
@@ -76,6 +85,7 @@ Glib::RefPtr<Gtk::StyleProvider> CustomStyleProvider::provider() {
     if (css->load_from_data(data)) {
       provider_ = css;
     }
+    dirty_ = false;
   }
   return provider_;
 }
