@@ -324,7 +324,11 @@
               <object class="GtkLabel" id="label_total0">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+<<<<<<< HEAD
                 <property name="label" translatable="yes">Σ</property>
+=======
+                <property name="label" translatable="yes">Total</property>
+>>>>>>> refs/remotes/origin/master
               </object>
               <packing>
                 <property name="left_attach">2</property>
@@ -335,7 +339,11 @@
               <object class="GtkLabel" id="label_total1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+<<<<<<< HEAD
                 <property name="label" translatable="yes">320</property>
+=======
+                <property name="label" translatable="yes">0</property>
+>>>>>>> refs/remotes/origin/master
               </object>
               <packing>
                 <property name="left_attach">2</property>
