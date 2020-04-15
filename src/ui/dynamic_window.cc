@@ -86,6 +86,18 @@ void DynamicWindow::redo_layout() {
   update_fonts();
 
   if (outer_box_) {
+    Log::printf(Log::LDEBUG, "Layout old:\n");
+    if (GTK_IS_CONTAINER(outer_box_->gobj())) {
+      std::vector<Gtk::Widget *> widgets =
+        static_cast<Gtk::Container *>(outer_box_)->get_children();
+      for (unsigned i = 0; i < widgets.size(); ++i) {
+        Log::printf(Log::LDEBUG, "    %s w:%d h:%d\n",
+                    widgets[i]->get_name().c_str(),
+                    widgets[i]->get_width(),
+                    widgets[i]->get_height());
+      }
+    }
+
     remove();
     delete outer_box_;
   }
@@ -317,8 +329,11 @@ void DynamicWindow::layout_score(Gtk::Grid *score, int w, int h,
   int edit_size = w - line_size * 8 - 20;
 
   score_ = score;
-  Log::printf(Log::LDEBUG, "Score w:%d h:%d = 8 * %d + %d, %d * %d\n", w, h,
-              line_size, edit_size, players_ + 1, line_size);
+  Log::printf(Log::LDEBUG, "Score w:%d h:%d = 8 * %d + %d, %d * %d {%d,%d}\n",
+              w, h,
+              line_size, edit_size, players_ + 1, line_size,
+              8 * line_size + edit_size, (players_ + 1) * line_size);
+  int ww[8] = {0};
   char name[128];
   for (int i = 0; i < players_ + 1; ++i) {
     Gtk::Label *label = new Gtk::Label(i ? "" : "#");
@@ -327,6 +342,8 @@ void DynamicWindow::layout_score(Gtk::Grid *score, int w, int h,
     label->set_size_request(line_size, line_size);
     label->get_style_context()->add_provider(score_black_, kProviderPriority);
     score->attach(*Gtk::manage(label), 0, i, 1, 1);
+    ww[0] = label->get_allocated_width() > ww[0] ?
+        label->get_allocated_width() : ww[0];  // !!!
 
     if (i) {
       Gtk::Entry *edit = new Gtk::Entry();
@@ -337,6 +354,8 @@ void DynamicWindow::layout_score(Gtk::Grid *score, int w, int h,
       edit->get_style_context()->add_provider(
           edit_black_on_gray_, kProviderPriority);
       score->attach(*Gtk::manage(edit), 1, i, 1, 1);
+      ww[1] = edit->get_allocated_width() > ww[1] ?
+          edit->get_allocated_width() : ww[1];  // !!!
     } else {
       label = new Gtk::Label("Игрок");
       label->set_size_request(line_size, line_size);
@@ -350,6 +369,8 @@ void DynamicWindow::layout_score(Gtk::Grid *score, int w, int h,
     label->set_size_request(line_size * 2, line_size);
     label->get_style_context()->add_provider(score_black_, kProviderPriority);
     score->attach(*Gtk::manage(label), 2, i, 1, 1);
+    ww[2] = label->get_allocated_width() > ww[2] ?
+        label->get_allocated_width() : ww[2];  // !!!
     for (int j = 0; j < 5; ++j) {
       Gtk::Button *button = new Gtk::Button();
       snprintf(name, sizeof(name), "b%d_%d", i, j);
@@ -370,6 +391,13 @@ void DynamicWindow::layout_score(Gtk::Grid *score, int w, int h,
               sigc::mem_fun(*this, &DynamicWindow::on_button_clicked),
                             name));
       score->attach(*Gtk::manage(button), 3 + j, i, 1, 1);
+      ww[3 + j] = button->get_allocated_width() > ww[3 + j] ?
+          button->get_allocated_width() : ww[3 + j];  // !!!
     }
   }
+  Log::printf(Log::LDEBUG, "Line %d + %d + %d + %d + %d + %d + %d + %d + "
+              "7 * %d = %d\n", ww[0], ww[1], ww[2], ww[3],
+              ww[4], ww[5], ww[6], ww[7], score->get_column_spacing(),
+              ww[0] + ww[1] + ww[2] + ww[3] + ww[4] + ww[5] + ww[6] + ww[7] +
+              score->get_column_spacing() * 7);
 }
